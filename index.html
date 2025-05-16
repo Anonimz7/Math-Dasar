@@ -438,6 +438,7 @@
                     <option value="subtraction">Pengurangan (-)</option>
                     <option value="multiplication">Perkalian (×)</option>
                     <option value="division">Pembagian (÷)</option>
+                    <option value="random">Acak Semua Operasi</option>
                 </select>
             </div>
             
@@ -638,8 +639,15 @@
                         
                         let questionText = '';
                         let correctAnswer;
+                        let currentOperation = operation;
                         
-                        switch (operation) {
+                        // Jika operasi diatur ke random, pilih operasi secara acak
+                        if (operation === 'random') {
+                            const operations = ['addition', 'subtraction', 'multiplication', 'division'];
+                            currentOperation = operations[Math.floor(Math.random() * operations.length)];
+                        }
+                        
+                        switch (currentOperation) {
                             case 'addition':
                                 questionText = `${a} + ${b} =`;
                                 correctAnswer = a + b;
@@ -692,6 +700,7 @@
                             questionNumber: questionIndex + 1,
                             questionText: questionText,
                             correctAnswer: correctAnswer,
+                            operation: currentOperation,
                             userInput: showAnswers ? null : answerCell.querySelector('input')
                         });
                     }
@@ -740,7 +749,8 @@
                                 number: q.questionNumber,
                                 question: q.questionText,
                                 userAnswer: isNaN(userAnswer) ? '(kosong)' : userAnswer,
-                                correctAnswer: q.correctAnswer
+                                correctAnswer: q.correctAnswer,
+                                operation: q.operation
                             });
                         }
                     }
@@ -776,8 +786,17 @@
                     mistakes.forEach(mistake => {
                         const item = document.createElement('div');
                         item.className = 'mistake-item';
+                        
+                        let operationSymbol = '';
+                        switch(mistake.operation) {
+                            case 'addition': operationSymbol = '+'; break;
+                            case 'subtraction': operationSymbol = '-'; break;
+                            case 'multiplication': operationSymbol = '×'; break;
+                            case 'division': operationSymbol = '÷'; break;
+                        }
+                        
                         item.innerHTML = `
-                            <p><strong>No. ${mistake.number}:</strong> ${mistake.question}</p>
+                            <p><strong>No. ${mistake.number}:</strong> ${mistake.question.replace(/[+\-×÷]/, operationSymbol)}</p>
                             <p>Jawaban Anda: <span class="incorrect-answer">${mistake.userAnswer}</span></p>
                             <p>Jawaban benar: <span class="correct-answer">${mistake.correctAnswer}</span></p>
                         `;
